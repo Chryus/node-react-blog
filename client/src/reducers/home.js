@@ -9,7 +9,12 @@ export default (state={articles: []}, action) => {
       return {
         ...state,
         articles: ([action.data.article]).concat(state.articles),
-      }
+      };
+    case 'DELETE_ARTICLE':
+      return {
+        ...state,
+        articles: state.articles.filter((article) => article._id !== action.id),
+      };
     default:
       return state;
   }
