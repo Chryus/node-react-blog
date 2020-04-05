@@ -6,17 +6,34 @@ function Form(props) {
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
   const [author, setAuthor] = useState("");
+  const { articleToEdit } = props;
 
+  const clearArticle = () => {
+    setTitle('');
+    setBody('');
+    setAuthor('');
+  }
 
   const handleSubmit = (evt) => {
-    const { onSubmit } = props;
+    const { onSubmit, articleToEdit, onEdit } = props;
 
-    return axios.post('http://localhost:8000/api/articles', {
-      title,
-      body,
-      author,
-    })
-      .then((res) => onSubmit(res.data));
+    if(!articleToEdit) {
+      return axios.post('http://localhost:8000/api/articles', {
+        title,
+        body,
+        author,
+      })
+        .then((res) => onSubmit(res.data))
+        .then(() => clearArticle());
+    } else {
+      return axios.patch(`http://localhost:8000/api/articles/${articleToEdit._id}`, {
+        title,
+        body,
+        author,
+      })
+        .then((res) => onEdit(res.data))
+        .then(() => clearArticle());
+    }
   }
 
   return (
@@ -39,13 +56,18 @@ function Form(props) {
         className="form-control my-3"
         placeholder="Article Author"
       />
-    <button onClick={handleSubmit} className="btn btn-primary float-right">Submit</button>
+     <button onClick={handleSubmit} className="btn btn-primary float-right">{articleToEdit ? 'Update' : 'Submit'}</button>
     </div>
   )
 }
 
 const mapDispatchToProps = dispatch => ({
   onSubmit: data => dispatch({ type: 'SUBMIT_ARTICLE', data }),
+  onEdit: data => dispatch({ type: 'EDIT_ARTICLE', data }),
 });
 
-export default connect(null, mapDispatchToProps)(Form);
+const mapStateToProps = state => ({
+  articleToEdit: state.home.articleToEdit,
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(Form);
