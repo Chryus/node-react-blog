@@ -9,7 +9,7 @@
     "start": "webpack-dev-server --mode development --open"
   },
   "engines": {
-    "node": "13.6.0"
+    "node": "13.12.0"
   },
   "author": "",
   "license": "ISC",
